@@ -10,6 +10,7 @@
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,mdx}\" --cache"
   },
   "dependencies": {
+    "@vercel/kv": "^0.2.4",
     "ai": "^2.2.20",
     "next": "14.0.1",
     "openai": "^4.15.0",

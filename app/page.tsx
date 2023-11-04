@@ -1,4 +1,4 @@
-import Chat from '@/components/chat'
+import Chat from './chat'
 
 export const runtime = 'edge'
 
@@ -9,7 +9,7 @@ export default function RootPage() {
     <main className="p-4">
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         {Array.from({ length: CHAT_INSTANCE_NUM }).map((_, i) => (
-          <Chat key={i} id={i.toString()} />
+          <Chat key={i} id={`${i}`} />
         ))}
       </div>
     </main>

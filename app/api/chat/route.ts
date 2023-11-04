@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { kv } from '@vercel/kv'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
 
@@ -10,7 +11,7 @@ export const runtime = 'edge'
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, code } = await req.json()
+    const { code, id, messages } = await req.json()
 
     const isValid = process.env.CODE?.split(',').includes(code)
     if (!isValid) {
@@ -25,7 +26,23 @@ export async function POST(req: NextRequest) {
       stream: true,
       messages,
     })
-    const stream = OpenAIStream(response)
+
+    const stream = OpenAIStream(response, {
+      async onCompletion(completion) {
+        const payload = {
+          id,
+          messages: [
+            ...messages,
+            {
+              content: completion,
+              role: 'assistant',
+            },
+          ],
+        }
+        await kv.hset(`chat:${id}`, payload)
+      },
+    })
+
     return new StreamingTextResponse(stream)
   } catch (error: any) {
     return NextResponse.json(

@@ -1,27 +1,30 @@
 import * as React from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useChat } from 'ai/react'
+import type { ChatRequestOptions, CreateMessage, Message } from 'ai'
 
 import TextareaAutosize from '@/components/ui/textarea-autosize'
 
 interface IProps {
-  id: string
+  input: string
+  handleInputChange: (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+  ) => void
+  append: (
+    message: Message | CreateMessage,
+    chatRequestOptions?: ChatRequestOptions
+  ) => Promise<string | null | undefined>
+  setInput: React.Dispatch<React.SetStateAction<string>>
+  isLoading: boolean
 }
 
-export default function ChatInput({ id }: IProps) {
-  const searchParams = useSearchParams()
-  const code = searchParams.get('code')
-
-  const { input, handleInputChange, append, setInput, isLoading } = useChat({
-    id,
-    body: {
-      code,
-    },
-    onError: (err) => {
-      alert(err.message)
-    },
-  })
-
+export default function ChatInput({
+  input,
+  handleInputChange,
+  append,
+  setInput,
+  isLoading,
+}: IProps) {
   const onSubmit = (content: string) => {
     const q = content.trim()
     if (q === '' || isLoading) return

@@ -1,12 +1,10 @@
-import { useChat } from 'ai/react'
+import type { Message } from 'ai'
 
 interface IProps {
-  id: string
+  messages: Message[]
 }
 
-export default function ChatList({ id }: IProps) {
-  const { messages } = useChat({ id })
-
+export default function ChatList({ messages }: IProps) {
   if (messages.length === 0) return null
 
   return (
