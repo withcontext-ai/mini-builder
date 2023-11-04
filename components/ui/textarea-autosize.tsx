@@ -124,21 +124,6 @@ function useInputRows(
   userInput: string
 ) {
   const [inputRows, setInputRows] = React.useState(1)
-  // const measure = useDebouncedCallback(
-  //   () => {
-  //     const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1
-  //     const inputRows = Math.min(20, rows)
-  //     setInputRows(inputRows)
-  //   },
-  //   100,
-  //   {
-  //     leading: true,
-  //     trailing: true,
-  //   }
-  // )
-
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // React.useEffect(measure, [userInput])
 
   React.useEffect(() => {
     const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1
