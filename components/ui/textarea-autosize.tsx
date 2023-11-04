@@ -2,7 +2,6 @@
 
 // code copy from https://github.com/Yidadaa/ChatGPT-Next-Web/blob/b90dfb48ee0446fdcb567dae2b77220508f62f0d/app/components/chat.tsx
 import * as React from 'react'
-import { useDebouncedCallback } from 'use-debounce'
 
 const DEFAULT_FONT_SIZE = '16px'
 const DEFAULT_LINE_HEIGHT = '24px'
@@ -125,21 +124,27 @@ function useInputRows(
   userInput: string
 ) {
   const [inputRows, setInputRows] = React.useState(1)
-  const measure = useDebouncedCallback(
-    () => {
-      const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1
-      const inputRows = Math.min(20, rows)
-      setInputRows(inputRows)
-    },
-    100,
-    {
-      leading: true,
-      trailing: true,
-    }
-  )
+  // const measure = useDebouncedCallback(
+  //   () => {
+  //     const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1
+  //     const inputRows = Math.min(20, rows)
+  //     setInputRows(inputRows)
+  //   },
+  //   100,
+  //   {
+  //     leading: true,
+  //     trailing: true,
+  //   }
+  // )
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(measure, [userInput])
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // React.useEffect(measure, [userInput])
+
+  React.useEffect(() => {
+    const rows = inputRef.current ? autoGrowTextArea(inputRef.current) : 1
+    const inputRows = Math.min(20, rows)
+    setInputRows(inputRows)
+  }, [userInput, inputRef])
 
   return inputRows
 }
