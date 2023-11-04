@@ -8,10 +8,10 @@ export default function ChatList({ messages }: IProps) {
   if (messages.length === 0) return null
 
   return (
-    <ul>
+    <ul className="space-y-2">
       {messages.map((m) => (
         <li key={m.id}>
-          {m.role}: {m.content}
+          <strong>{m.role}:</strong> {m.content}
         </li>
       ))}
     </ul>
