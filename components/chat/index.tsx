@@ -10,9 +10,10 @@ import ChatList from './list'
 interface IProps {
   id: string
   initialMessages?: Message[]
+  initialSummary?: string
 }
 
-export default function Chat({ id, initialMessages }: IProps) {
+export default function Chat({ id, initialMessages, initialSummary }: IProps) {
   const searchParams = useSearchParams()
   const code = searchParams.get('code')
 
@@ -31,6 +32,11 @@ export default function Chat({ id, initialMessages }: IProps) {
 
   return (
     <div className="flex flex-col gap-4 rounded-md border p-4">
+      {initialSummary && (
+        <p>
+          <strong>summary:</strong> {initialSummary}
+        </p>
+      )}
       <ChatList messages={messages} />
       <ChatInput
         input={input}

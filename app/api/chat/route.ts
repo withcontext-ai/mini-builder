@@ -29,17 +29,32 @@ export async function POST(req: NextRequest) {
 
     const stream = OpenAIStream(response, {
       async onCompletion(completion) {
+        const newMessages = [
+          ...messages,
+          {
+            role: 'assistant',
+            content: completion,
+          },
+        ]
         const payload = {
           id,
-          messages: [
-            ...messages,
-            {
-              content: completion,
-              role: 'assistant',
-            },
-          ],
+          messages: newMessages,
         }
         await kv.hset(`chat:${id}`, payload)
+
+        const response = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            ...newMessages,
+            {
+              role: 'system',
+              content:
+                'Summarize the discussion briefly in 200 words or less to use as a prompt for future context.',
+            },
+          ],
+        })
+        const summary = response.choices[0].message.content
+        await kv.hset(`chat:${id}`, { summary })
       },
     })
 

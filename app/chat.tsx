@@ -14,5 +14,11 @@ export default async function Chat({ id }: IProps) {
     notFound()
   }
 
-  return <ChatComponent id={id} initialMessages={chat.messages} />
+  return (
+    <ChatComponent
+      id={id}
+      initialMessages={chat.messages}
+      initialSummary={chat.summary}
+    />
+  )
 }
