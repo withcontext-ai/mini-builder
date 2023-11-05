@@ -61,12 +61,14 @@ function countMessages(msgs: Message[]) {
 
 function sliceMessages(msg: any[], maxLength = MAX_TOKEN_LENGTH) {
   let length = 0
-  let index = msg.length - 1
-  while (length < maxLength) {
-    length += estimateTokenLength(msg[index].content)
+  let index = msg.length
+  console.log('index 1:', index)
+  while (length < maxLength && index > 0) {
+    length += estimateTokenLength(msg[index - 1].content)
     index--
   }
-  return msg.slice(-index)
+  console.log('index 2:', index, length)
+  return msg.slice(index)
 }
 
 export async function POST(req: NextRequest) {
