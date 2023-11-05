@@ -16,7 +16,7 @@ const makeSummaryPrompt = (summary?: string) => {
     ? [
         {
           role: 'system',
-          content: `This is a summary of the chat history as a recap: ${summary}`,
+          content: `This is a summary of the chat history as a recap: ${summary}\n\nThe following messages is a continuation of the conversation.`,
         },
       ]
     : []
@@ -127,14 +127,16 @@ export async function POST(req: NextRequest) {
         const historyMsgLength = countMessages(newMessages)
         console.log('historyMsgLength 2:', historyMsgLength)
         if (historyMsgLength > MAX_TOKEN_LENGTH) {
+          const messages = [
+            ...summaryMessages,
+            ...latestMessages,
+            ...completionMessage,
+            ...summarizePrompt,
+          ]
+          console.log('messages:', messages)
           const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
-            messages: [
-              ...summaryMessages,
-              ...latestMessages,
-              ...completionMessage,
-              ...summarizePrompt,
-            ],
+            messages,
           })
           const summary = response.choices[0].message.content
           console.log('summary:', summary)
