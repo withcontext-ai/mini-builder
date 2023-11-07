@@ -5,11 +5,15 @@ import OpenAI from 'openai'
 
 import { getChat } from '@/lib/actions/chat'
 
+export const runtime = 'edge'
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-export const runtime = 'edge'
+// gpt-3.5-turbo-1106
+// gpt-4-1106-preview
+const model = 'gpt-4-1106-preview'
 
 const makeSummaryPrompt = (summary?: string) => {
   return summary
@@ -83,8 +87,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const historyMsgLength = countMessages(messages)
-    console.log('historyMsgLength 1:', historyMsgLength)
+    // const historyMsgLength = countMessages(messages)
+    // console.log('historyMsgLength 1:', historyMsgLength)
 
     const systemMessages = [
       {
@@ -93,18 +97,20 @@ export async function POST(req: NextRequest) {
       },
     ]
 
-    const { summary } = await getChat(id)
-    const summaryMessages =
-      historyMsgLength > MAX_TOKEN_LENGTH ? makeSummaryPrompt(summary) : []
+    // const { summary } = await getChat(id)
+    // const summaryMessages =
+    //   historyMsgLength > MAX_TOKEN_LENGTH ? makeSummaryPrompt(summary) : []
 
-    const latestMessages = sliceMessages(messages)
+    // const latestMessages = sliceMessages(messages)
 
-    // Combine all messages
-    const _messages = [...systemMessages, ...summaryMessages, ...latestMessages]
-    console.log('_messages:', _messages)
+    // // Combine all messages
+    // const _messages = [...systemMessages, ...summaryMessages, ...latestMessages]
+
+    const _messages = [...systemMessages, ...messages]
+    // console.log('_messages:', _messages)
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model,
       stream: true,
       messages: _messages,
     })
@@ -123,25 +129,25 @@ export async function POST(req: NextRequest) {
           messages: newMessages,
         })
 
-        // Summarize the chat history
-        const historyMsgLength = countMessages(newMessages)
-        console.log('historyMsgLength 2:', historyMsgLength)
-        if (historyMsgLength > MAX_TOKEN_LENGTH) {
-          const messages = [
-            ...summaryMessages,
-            ...latestMessages,
-            ...completionMessage,
-            ...summarizePrompt,
-          ]
-          console.log('messages:', messages)
-          const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            messages,
-          })
-          const summary = response.choices[0].message.content
-          console.log('summary:', summary)
-          await kv.hset(`chat:${id}`, { summary })
-        }
+        // // Summarize the chat history
+        // const historyMsgLength = countMessages(newMessages)
+        // console.log('historyMsgLength 2:', historyMsgLength)
+        // if (historyMsgLength > MAX_TOKEN_LENGTH) {
+        //   const messages = [
+        //     ...summaryMessages,
+        //     ...latestMessages,
+        //     ...completionMessage,
+        //     ...summarizePrompt,
+        //   ]
+        //   console.log('messages:', messages)
+        //   const response = await openai.chat.completions.create({
+        //     model: 'gpt-3.5-turbo',
+        //     messages,
+        //   })
+        //   const summary = response.choices[0].message.content
+        //   console.log('summary:', summary)
+        //   await kv.hset(`chat:${id}`, { summary })
+        // }
       },
     })
 
