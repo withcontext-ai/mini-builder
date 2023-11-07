@@ -9,6 +9,7 @@ export const runtime = 'edge'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENAI_BASE_PATH,
 })
 
 // gpt-3.5-turbo-1106
