@@ -32,12 +32,6 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
 
   return (
     <div className="flex flex-col gap-4 rounded-md border p-4">
-      {initialSummary && (
-        <p>
-          <strong>summary:</strong> {initialSummary}
-        </p>
-      )}
-      <ChatList messages={messages} />
       <ChatInput
         input={input}
         handleInputChange={handleInputChange}
@@ -45,6 +39,12 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
         setInput={setInput}
         isLoading={isLoading}
       />
+      {initialSummary && (
+        <p>
+          <strong>summary:</strong> {initialSummary}
+        </p>
+      )}
+      <ChatList messages={messages} />
     </div>
   )
 }
