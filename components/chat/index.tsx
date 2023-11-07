@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import type { Message } from 'ai'
 import { useChat } from 'ai/react'
+import { useFormStatus } from 'react-dom'
 
 import { clearChat } from '@/lib/actions/chat'
 
@@ -43,13 +44,7 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
       />
       {messages.length > 0 && (
         <form action={clearChat}>
-          <button
-            name="id"
-            value={id}
-            className="rounded-md border px-2 py-1 text-sm"
-          >
-            clear memory
-          </button>
+          <ClearButton id={id} />
         </form>
       )}
       {initialSummary && (
@@ -59,5 +54,22 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
       )}
       <ChatList messages={messages} />
     </div>
+  )
+}
+
+function ClearButton({ id }: { id: string }) {
+  const { pending } = useFormStatus()
+
+  return (
+    <button
+      type="submit"
+      name="id"
+      value={id}
+      className="rounded-md border px-2 py-1 text-sm disabled:opacity-50"
+      disabled={pending}
+      aria-disabled={pending}
+    >
+      clear memory
+    </button>
   )
 }
