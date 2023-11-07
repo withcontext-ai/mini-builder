@@ -1,5 +1,7 @@
 import type { Message } from 'ai'
 
+import Markdown from './markdown'
+
 interface IProps {
   messages: Message[]
 }
@@ -11,7 +13,8 @@ export default function ChatList({ messages }: IProps) {
     <ul className="flex flex-col-reverse gap-2">
       {messages.map((m, idx) => (
         <li key={idx}>
-          <strong>{m.role}:</strong> {m.content}
+          <strong>{m.role}:</strong>
+          <Markdown>{m.content}</Markdown>
         </li>
       ))}
     </ul>
