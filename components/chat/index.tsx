@@ -4,6 +4,8 @@ import { useSearchParams } from 'next/navigation'
 import type { Message } from 'ai'
 import { useChat } from 'ai/react'
 
+import { clearChat } from '@/lib/actions/chat'
+
 import ChatInput from './input'
 import ChatList from './list'
 
@@ -39,6 +41,17 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
         setInput={setInput}
         isLoading={isLoading}
       />
+      {messages.length > 0 && (
+        <form action={clearChat}>
+          <button
+            name="id"
+            value={id}
+            className="rounded-md border px-2 py-1 text-sm"
+          >
+            clear memory
+          </button>
+        </form>
+      )}
       {initialSummary && (
         <p>
           <strong>summary:</strong> {initialSummary}
