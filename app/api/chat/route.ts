@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
-import { Message, OpenAIStream, StreamingTextResponse } from 'ai'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
-
-import { getChat } from '@/lib/actions/chat'
 
 export const runtime = 'edge'
 
@@ -16,69 +14,9 @@ const openai = new OpenAI({
 // gpt-4-1106-preview
 const model = 'gpt-4-1106-preview'
 
-const makeSummaryPrompt = (summary?: string) => {
-  return summary
-    ? [
-        {
-          role: 'system',
-          content: `This is a summary of the chat history as a recap: ${summary}\n\nThe following messages is a continuation of the conversation.`,
-        },
-      ]
-    : []
-}
-
-const summarizePrompt = [
-  {
-    role: 'system',
-    content:
-      'Summarize the discussion briefly in 200 words or less to use as a prompt for future context.',
-  },
-]
-
-const MAX_TOKEN_LENGTH = 2000
-
-function estimateTokenLength(input: string): number {
-  let tokenLength = 0
-
-  for (let i = 0; i < input.length; i++) {
-    const charCode = input.charCodeAt(i)
-
-    if (charCode < 128) {
-      // ASCII character
-      if (charCode <= 122 && charCode >= 65) {
-        // a-Z
-        tokenLength += 0.25
-      } else {
-        tokenLength += 0.5
-      }
-    } else {
-      // Unicode character
-      tokenLength += 1.5
-    }
-  }
-
-  return tokenLength
-}
-
-function countMessages(msgs: Message[]) {
-  return msgs.reduce((pre, cur) => pre + estimateTokenLength(cur.content), 0)
-}
-
-function sliceMessages(msg: any[], maxLength = MAX_TOKEN_LENGTH) {
-  let length = 0
-  let index = msg.length
-  console.log('index 1:', index)
-  while (length < maxLength && index > 0) {
-    length += estimateTokenLength(msg[index - 1].content)
-    index--
-  }
-  console.log('index 2:', index, length)
-  return msg.slice(index)
-}
-
 export async function POST(req: NextRequest) {
   try {
-    const { code, id, messages } = await req.json()
+    const { code, id, messages: _messages } = await req.json()
 
     const isValid = process.env.CODE?.split(',').includes(code)
     if (!isValid) {
@@ -88,9 +26,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // const historyMsgLength = countMessages(messages)
-    // console.log('historyMsgLength 1:', historyMsgLength)
-
     const systemMessages = [
       {
         role: 'system',
@@ -98,22 +33,12 @@ export async function POST(req: NextRequest) {
       },
     ]
 
-    // const { summary } = await getChat(id)
-    // const summaryMessages =
-    //   historyMsgLength > MAX_TOKEN_LENGTH ? makeSummaryPrompt(summary) : []
-
-    // const latestMessages = sliceMessages(messages)
-
-    // // Combine all messages
-    // const _messages = [...systemMessages, ...summaryMessages, ...latestMessages]
-
-    const _messages = [...systemMessages, ...messages]
-    // console.log('_messages:', _messages)
+    const messages = [...systemMessages, ..._messages]
 
     const response = await openai.chat.completions.create({
       model,
       stream: true,
-      messages: _messages,
+      messages,
     })
 
     const stream = OpenAIStream(response, {
@@ -124,31 +49,11 @@ export async function POST(req: NextRequest) {
             content: completion,
           },
         ]
-        const newMessages = [...messages, ...completionMessage]
+        const messages = [..._messages, ...completionMessage]
         await kv.hset(`chat:${id}`, {
           id,
-          messages: newMessages,
+          messages,
         })
-
-        // // Summarize the chat history
-        // const historyMsgLength = countMessages(newMessages)
-        // console.log('historyMsgLength 2:', historyMsgLength)
-        // if (historyMsgLength > MAX_TOKEN_LENGTH) {
-        //   const messages = [
-        //     ...summaryMessages,
-        //     ...latestMessages,
-        //     ...completionMessage,
-        //     ...summarizePrompt,
-        //   ]
-        //   console.log('messages:', messages)
-        //   const response = await openai.chat.completions.create({
-        //     model: 'gpt-3.5-turbo',
-        //     messages,
-        //   })
-        //   const summary = response.choices[0].message.content
-        //   console.log('summary:', summary)
-        //   await kv.hset(`chat:${id}`, { summary })
-        // }
       },
     })
 
