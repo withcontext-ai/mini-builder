@@ -11,12 +11,17 @@ export async function getChat(id: string) {
 }
 
 export async function clearChat(formData: FormData) {
+  const code = formData.get('code') as string
+  const isValid = process.env.CODE?.split(',').includes(code)
+  if (!isValid) {
+    throw new Error('Invalid code')
+  }
   const id = formData.get('id') as string
   try {
     await kv.del(`chat:${id}`)
   } catch (error) {
     console.log('clearChat error:', error)
   } finally {
-    revalidatePath('/')
+    revalidatePath('/', 'layout')
   }
 }

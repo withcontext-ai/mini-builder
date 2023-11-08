@@ -5,6 +5,7 @@ import { useChat } from 'ai/react'
 import { useFormStatus } from 'react-dom'
 
 import { clearChat } from '@/lib/actions/chat'
+import { getCode, isServer } from '@/lib/utils'
 
 import ChatInput from './input'
 import ChatList from './list'
@@ -15,6 +16,8 @@ interface IProps {
   initialSummary?: string
 }
 
+const code = getCode()
+
 export default function Chat({ id, initialMessages, initialSummary }: IProps) {
   const { messages, input, handleInputChange, append, setInput, isLoading } =
     useChat({
@@ -22,7 +25,7 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
       initialMessages,
       body: {
         id,
-        code: localStorage.getItem('code') || '',
+        code,
       },
       onError: (err) => {
         alert(err.message)
@@ -41,6 +44,7 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
       {messages.length > 0 && (
         <form action={clearChat}>
           <ClearButton id={id} />
+          <input name="code" value={code} readOnly className="hidden" />
         </form>
       )}
       {initialSummary && (
