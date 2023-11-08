@@ -14,7 +14,7 @@ export async function clearChat(formData: FormData) {
   const code = formData.get('code') as string
   const isValid = process.env.CODE?.split(',').includes(code)
   if (!isValid) {
-    throw new Error('Invalid code')
+    return { error: 'Invalid code' }
   }
   const id = formData.get('id') as string
   try {
@@ -22,6 +22,6 @@ export async function clearChat(formData: FormData) {
   } catch (error) {
     console.log('clearChat error:', error)
   } finally {
-    revalidatePath('/', 'layout')
+    revalidatePath('/')
   }
 }

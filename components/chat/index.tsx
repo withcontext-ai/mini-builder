@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import type { Message } from 'ai'
 import { useChat } from 'ai/react'
 import { useFormStatus } from 'react-dom'
@@ -19,6 +20,7 @@ interface IProps {
 const code = getCode()
 
 export default function Chat({ id, initialMessages, initialSummary }: IProps) {
+  const router = useRouter()
   const { messages, input, handleInputChange, append, setInput, isLoading } =
     useChat({
       id,
@@ -42,7 +44,12 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
         isLoading={isLoading}
       />
       {messages.length > 0 && (
-        <form action={clearChat}>
+        <form
+          action={(formData) => {
+            clearChat(formData)
+            router.refresh()
+          }}
+        >
           <ClearButton id={id} />
           <input name="code" value={code} readOnly className="hidden" />
         </form>
