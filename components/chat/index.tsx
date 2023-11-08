@@ -1,6 +1,5 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import type { Message } from 'ai'
 import { useChat } from 'ai/react'
 import { useFormStatus } from 'react-dom'
@@ -17,16 +16,13 @@ interface IProps {
 }
 
 export default function Chat({ id, initialMessages, initialSummary }: IProps) {
-  const searchParams = useSearchParams()
-  const code = searchParams.get('code')
-
   const { messages, input, handleInputChange, append, setInput, isLoading } =
     useChat({
       id,
       initialMessages,
       body: {
         id,
-        code,
+        code: localStorage.getItem('code') || '',
       },
       onError: (err) => {
         alert(err.message)
