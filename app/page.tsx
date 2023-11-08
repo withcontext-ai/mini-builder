@@ -8,7 +8,9 @@ export default function RootPage() {
   return (
     <main className="p-4">
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-        <Chat id="0" />
+        {Array.from({ length: CHAT_INSTANCE_NUM }).map((_, i) => (
+          <Chat key={i} id={`${i}`} />
+        ))}
       </div>
     </main>
   )
