@@ -1,16 +1,23 @@
-import Chat from './chat'
+import { notFound } from 'next/navigation'
+
+import { getChat } from '@/lib/actions/chat'
+import Chat from '@/components/chat'
 
 export const runtime = 'edge'
 
-const CHAT_INSTANCE_NUM = 3
+const chatId = '0'
 
-export default function RootPage() {
+export default async function RootPage() {
+  const chat = await getChat(chatId)
+
+  if (!chat) {
+    notFound()
+  }
+
   return (
     <main className="p-4">
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-        {Array.from({ length: CHAT_INSTANCE_NUM }).map((_, i) => (
-          <Chat key={i} id={`${i}`} />
-        ))}
+        <Chat id={chatId} initialMessages={chat.messages} />
       </div>
     </main>
   )

@@ -1,12 +1,11 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import type { Message } from 'ai'
 import { useChat } from 'ai/react'
 import { useFormStatus } from 'react-dom'
 
 import { clearChat } from '@/lib/actions/chat'
-import { getCode, isServer } from '@/lib/utils'
+import { getCode } from '@/lib/utils'
 
 import ChatInput from './input'
 import ChatList from './list'
@@ -14,25 +13,30 @@ import ChatList from './list'
 interface IProps {
   id: string
   initialMessages?: Message[]
-  initialSummary?: string
 }
 
 const code = getCode()
 
-export default function Chat({ id, initialMessages, initialSummary }: IProps) {
-  const router = useRouter()
-  const { messages, input, handleInputChange, append, setInput, isLoading } =
-    useChat({
+export default function Chat({ id, initialMessages }: IProps) {
+  const {
+    messages,
+    input,
+    handleInputChange,
+    append,
+    setInput,
+    isLoading,
+    setMessages,
+  } = useChat({
+    id,
+    initialMessages,
+    body: {
       id,
-      initialMessages,
-      body: {
-        id,
-        code,
-      },
-      onError: (err) => {
-        alert(err.message)
-      },
-    })
+      code,
+    },
+    onError: (err) => {
+      alert(err.message)
+    },
+  })
 
   return (
     <div className="flex flex-col gap-4 rounded-md border p-4">
@@ -45,19 +49,14 @@ export default function Chat({ id, initialMessages, initialSummary }: IProps) {
       />
       {messages.length > 0 && (
         <form
-          action={(formData) => {
-            clearChat(formData)
-            router.refresh()
+          action={async (formData) => {
+            await clearChat(formData)
+            setMessages([])
           }}
         >
           <ClearButton id={id} />
           <input name="code" value={code} readOnly className="hidden" />
         </form>
-      )}
-      {initialSummary && (
-        <p>
-          <strong>summary:</strong> {initialSummary}
-        </p>
       )}
       <ChatList messages={messages} />
     </div>
