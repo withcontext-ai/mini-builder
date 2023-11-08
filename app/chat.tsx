@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 
-import { getChat } from '@/lib/actions/chat'
 import ChatComponent from '@/components/chat'
 
 interface IProps {
@@ -8,7 +7,7 @@ interface IProps {
 }
 
 export default async function Chat({ id }: IProps) {
-  const chat = await getChat(id)
+  const chat = { id: '0', messages: [], summary: '' }
 
   if (!chat) {
     notFound()
