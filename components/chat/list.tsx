@@ -10,7 +10,7 @@ export default function ChatList({ messages }: IProps) {
   if (messages.length === 0) return null
 
   return (
-    <ul className="flex flex-col-reverse gap-2">
+    <ul className="flex flex-col-reverse gap-8">
       {messages.map((m, idx) => (
         <li key={idx}>
           <strong>{m.role}:</strong>
