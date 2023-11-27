@@ -9,6 +9,7 @@ import { getCode } from '@/lib/utils'
 
 import AuthCode from '../input/auth-code'
 import RevalidatePath from '../input/revalidate-path'
+import { Button } from '../ui/button'
 import ChatInput from './input'
 import ChatList from './list'
 
@@ -72,15 +73,16 @@ function ClearButton({ id }: { id: string }) {
   const { pending } = useFormStatus()
 
   return (
-    <button
+    <Button
       type="submit"
       name="id"
       value={id}
-      className="rounded-md border px-2 py-1 text-sm disabled:opacity-50"
+      variant="outline"
+      size="sm"
       disabled={pending}
       aria-disabled={pending}
     >
       clear memory
-    </button>
+    </Button>
   )
 }
