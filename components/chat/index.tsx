@@ -7,17 +7,20 @@ import { useFormStatus } from 'react-dom'
 import { clearChat } from '@/lib/actions/chat'
 import { getCode } from '@/lib/utils'
 
+import AuthCode from '../input/auth-code'
+import RevalidatePath from '../input/revalidate-path'
 import ChatInput from './input'
 import ChatList from './list'
 
 interface IProps {
   id: string
   initialMessages?: Message[]
+  botId?: string
 }
 
 const code = getCode()
 
-export default function Chat({ id, initialMessages }: IProps) {
+export default function Chat({ id, initialMessages, botId }: IProps) {
   const {
     messages,
     input,
@@ -32,6 +35,7 @@ export default function Chat({ id, initialMessages }: IProps) {
     body: {
       id,
       code,
+      botId,
     },
     onError: (err) => {
       alert(err.message)
@@ -55,7 +59,8 @@ export default function Chat({ id, initialMessages }: IProps) {
           }}
         >
           <ClearButton id={id} />
-          <input name="code" value={code} readOnly className="hidden" />
+          <RevalidatePath />
+          <AuthCode />
         </form>
       )}
       <ChatList messages={messages} />

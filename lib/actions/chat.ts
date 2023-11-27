@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { kv } from '@vercel/kv'
 
 import { type Chat } from '@/lib/types'
+import { checkCode } from '@/lib/utils'
 
 export async function getChat(id: string) {
   const chat = await kv.hgetall<Chat>(`chat:${id}`)
@@ -12,8 +13,7 @@ export async function getChat(id: string) {
 
 export async function clearChat(formData: FormData) {
   const code = formData.get('code') as string
-  const isValid = process.env.CODE?.split(',').includes(code)
-  if (!isValid) {
+  if (!checkCode(code)) {
     return { error: 'Invalid code' }
   }
   const id = formData.get('id') as string
@@ -22,6 +22,7 @@ export async function clearChat(formData: FormData) {
   } catch (error) {
     console.log('clearChat error:', error)
   } finally {
-    revalidatePath('/')
+    const path = formData.get('path') as string
+    revalidatePath(path ?? '/')
   }
 }

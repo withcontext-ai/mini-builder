@@ -3,6 +3,8 @@ import { kv } from '@vercel/kv'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
 
+import { getBot } from '@/lib/actions/bot'
+
 export const runtime = 'edge'
 
 const openai = new OpenAI({
@@ -16,7 +18,7 @@ const model = 'gpt-4-1106-preview'
 
 export async function POST(req: NextRequest) {
   try {
-    const { code, id, messages: _messages } = await req.json()
+    const { code, id, messages: _messages, botId } = await req.json()
 
     const isValid = process.env.CODE?.split(',').includes(code)
     if (!isValid) {
@@ -26,10 +28,20 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    let instruction =
+      'You are ChatGPT, a large language model trained by OpenAI.'
+
+    if (botId) {
+      const bot = await getBot(botId)
+      if (bot) instruction = bot.instruction
+    }
+
+    console.log('instruction:', instruction)
+
     const systemMessages = [
       {
         role: 'system',
-        content: 'You are ChatGPT, a large language model trained by OpenAI.',
+        content: instruction,
       },
     ]
 
