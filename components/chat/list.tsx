@@ -14,7 +14,9 @@ export default function ChatList({ messages }: IProps) {
       {messages.map((m, idx) => (
         <li key={idx}>
           <strong>{m.role}:</strong>
-          <Markdown>{m.content}</Markdown>
+          <div className="prose">
+            <Markdown>{m.content}</Markdown>
+          </div>
         </li>
       ))}
     </ul>
