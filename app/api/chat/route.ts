@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { kv } from '@vercel/kv'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
           id,
           messages,
         })
+        if (botId) revalidatePath(`/b/${botId}`)
       },
     })
 
