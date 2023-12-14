@@ -132,13 +132,18 @@ function useInputRows(
   return inputRows
 }
 
-interface IProps {
+interface IProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   input: string
   onInput: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  onSubmit: (content: string) => void
+  handleSubmit: (content: string) => void
 }
 
-export default function TextareaAutosize({ input, onInput, onSubmit }: IProps) {
+export default function TextareaAutosize({
+  input,
+  onInput,
+  handleSubmit,
+  ...props
+}: IProps) {
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { shouldSubmit } = useSubmitHandler()
   const inputRows = useInputRows(inputRef, input)
@@ -146,20 +151,21 @@ export default function TextareaAutosize({ input, onInput, onSubmit }: IProps) {
   const onInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (shouldSubmit(e)) {
       e.preventDefault()
-      onSubmit(input)
+      handleSubmit(input)
     }
   }
 
   return (
     <textarea
       ref={inputRef}
-      className="w-full resize-none rounded-md border p-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="flex w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       value={input}
       onInput={onInput}
       onKeyDown={onInputKeyDown}
       rows={inputRows}
       autoFocus={true}
       style={{ fontSize: DEFAULT_FONT_SIZE, lineHeight: DEFAULT_LINE_HEIGHT }}
+      {...props}
     />
   )
 }
